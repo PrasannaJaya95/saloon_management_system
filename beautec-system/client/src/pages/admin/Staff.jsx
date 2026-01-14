@@ -1,107 +1,279 @@
-import React from 'react';
-import { Clock, Star, MoreHorizontal, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Clock, Star, MoreHorizontal, TrendingUp, Plus, Trash2, Shield, Check } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
-const Staff = () => {
-    const staffMembers = [
-        { id: 1, name: 'Emma Davis', role: 'Senior Stylist', status: 'On Shift', rating: 4.8, shift: '9:00 AM - 5:00 PM', avatar: 'https://ui-avatars.com/api/?name=Emma+Davis&background=random', efficiency: 92 },
-        { id: 2, name: 'Liam Patel', role: 'Massage Therapist', status: 'Busy', rating: 4.9, shift: '11:00 AM - 7:00 PM', avatar: 'https://ui-avatars.com/api/?name=Liam+Patel&background=random', efficiency: 88 },
-        { id: 3, name: 'Sophia Kim', role: 'Nail Artist', status: 'Off Duty', rating: 4.7, shift: 'Off', avatar: 'https://ui-avatars.com/api/?name=Sophia+Kim&background=random', efficiency: 95 },
+const Staff = (props) => {
+    const { user } = useAuth(); // Logged in user info
+    const [staffMembers, setStaffMembers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'User',
+        position: '',
+        phone: '',
+        permissions: [] // Array of permission strings
+    });
+
+    const availablePermissions = [
+        { id: 'manage_bookings', label: 'Manage Bookings' },
+        { id: 'manage_inventory', label: 'Manage Inventory' },
+        { id: 'access_pos', label: 'Access POS' },
+        { id: 'view_reports', label: 'View Reports' },
+        { id: 'manage_staff', label: 'Manage Staff' }
     ];
 
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/users`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setStaffMembers(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch staff", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateUser = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('User created successfully');
+                setShowModal(false);
+                fetchUsers();
+                setFormData({ name: '', email: '', password: '', role: 'User', position: '', phone: '', permissions: [] });
+            } else {
+                alert(data.message || 'Failed to create user');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDeleteUser = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this user?')) return;
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/users/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.ok) {
+                fetchUsers();
+            } else {
+                alert('Failed to delete user');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const togglePermission = (permId) => {
+        setFormData(prev => {
+            if (prev.permissions.includes(permId)) {
+                return { ...prev, permissions: prev.permissions.filter(p => p !== permId) };
+            } else {
+                return { ...prev, permissions: [...prev.permissions, permId] };
+            }
+        });
+    };
+
     return (
-        <div className="space-y-8">
-            <div className="flex justify-between items-center bg-gray-900/50 p-6 rounded-3xl border border-gray-800 backdrop-blur-xl">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Staff Management</h1>
-                    <p className="text-gray-400 text-sm mt-1">Manage your team, schedules, and performance.</p>
+        <div className="space-y-4">
+            {!props.isSettingsMode && (
+                <div className="flex justify-between items-center bg-gray-900/50 p-6 rounded-3xl border border-gray-800 backdrop-blur-xl">
+                    <div>
+                        <h1 className="text-2xl font-bold text-white">Staff Management</h1>
+                        <p className="text-gray-400 text-sm mt-1">Manage your team, roles, and permissions.</p>
+                    </div>
                 </div>
-                <button className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-pink-500/25 transition-all active:scale-95 flex items-center gap-2 text-white">
-                    <span className="text-xl leading-none">+</span> Add Staff
+            )}
+
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold text-white">Team Members</h2>
+                {/* Only Admin/SuperAdmin can add users */}
+                <button onClick={() => setShowModal(true)} className="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg font-bold transition-all text-sm flex items-center gap-2 text-white shadow-lg shadow-purple-500/20">
+                    <Plus className="w-4 h-4" /> Add New User
                 </button>
             </div>
 
             {/* Roster Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {staffMembers.map(staff => (
-                    <div key={staff.id} className="bg-gray-900/50 backdrop-blur-md rounded-3xl p-6 border border-gray-800 relative group hover:border-gray-700 transition-all duration-300">
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl pointer-events-none"></div>
-
+                {loading ? <p className="text-gray-400">Loading staff...</p> : staffMembers.map(staff => (
+                    <div key={staff._id} className="bg-gray-900/50 backdrop-blur-md rounded-3xl p-6 border border-gray-800 relative group hover:border-gray-700 transition-all duration-300">
                         <div className="flex justify-between items-start mb-6 relative">
                             <div className="flex items-center gap-4">
                                 <div className="relative">
-                                    <img src={staff.avatar} alt={staff.name} className="w-16 h-16 rounded-2xl border-2 border-gray-700 group-hover:border-pink-500/50 transition-colors object-cover" />
-                                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${staff.status === 'On Shift' ? 'bg-green-500' :
-                                        staff.status === 'Busy' ? 'bg-red-500' : 'bg-gray-500'
+                                    <div className="w-16 h-16 rounded-2xl bg-gray-800 flex items-center justify-center text-xl font-bold text-gray-500 border-2 border-gray-700 object-cover">
+                                        {staff.name.charAt(0)}
+                                    </div>
+                                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${staff.status === 'Active' ? 'bg-green-500' : 'bg-gray-500'
                                         }`}></div>
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-lg text-white">{staff.name}</h3>
-                                    <p className="text-pink-400 text-sm font-medium">{staff.role}</p>
+                                    <p className="text-pink-400 text-sm font-medium">{staff.position || staff.role}</p>
                                 </div>
                             </div>
-                            <button className="text-gray-500 hover:text-white p-2 hover:bg-gray-800/50 rounded-lg transition-colors">
-                                <MoreHorizontal className="w-5 h-5" />
-                            </button>
+
+                            {user && user.role === 'SuperAdmin' && staff.role !== 'SuperAdmin' && (
+                                <button onClick={() => handleDeleteUser(staff._id)} className="text-gray-500 hover:text-red-500 p-2 hover:bg-gray-800/50 rounded-lg transition-colors">
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            )}
+                            {user && user.role === 'Admin' && staff.role !== 'SuperAdmin' && staff.role !== 'Admin' && (
+                                <button onClick={() => handleDeleteUser(staff._id)} className="text-gray-500 hover:text-red-500 p-2 hover:bg-gray-800/50 rounded-lg transition-colors">
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            )}
                         </div>
 
                         <div className="space-y-3 relative">
                             <div className="flex justify-between items-center p-3 bg-black/40 rounded-xl border border-gray-800/50">
                                 <div className="flex items-center gap-2 text-gray-400">
-                                    <Clock className="w-4 h-4" />
-                                    <span className="text-sm">Shift</span>
+                                    <Shield className="w-4 h-4" />
+                                    <span className="text-sm">Role</span>
                                 </div>
-                                <span className="text-sm font-medium text-white">{staff.shift}</span>
+                                <span className="text-sm font-medium text-white">{staff.role}</span>
                             </div>
 
-                            <div className="flex justify-between items-center p-3 bg-black/40 rounded-xl border border-gray-800/50">
-                                <div className="flex items-center gap-2 text-gray-400">
-                                    <Star className="w-4 h-4 text-yellow-500" />
-                                    <span className="text-sm">Rating</span>
-                                </div>
-                                <span className="text-sm font-bold text-white flex items-center gap-1">
-                                    {staff.rating} <span className="text-gray-600 font-normal">/ 5.0</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 pt-6 border-t border-gray-800 relative">
-                            <div className="flex justify-between text-xs text-gray-400 mb-2">
-                                <span>Efficiency</span>
-                                <span>{staff.efficiency}%</span>
-                            </div>
-                            <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
-                                <div
-                                    className={`h-full rounded-full ${staff.efficiency > 90 ? 'bg-emerald-500' : 'bg-blue-500'}`}
-                                    style={{ width: `${staff.efficiency}%` }}
-                                ></div>
+                            {/* Permissions Badges */}
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {staff.permissions && staff.permissions.map(p => (
+                                    <span key={p} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md border border-gray-700">
+                                        {p.replace('_', ' ')}
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Mock KPI Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-8 bg-gray-900/50 backdrop-blur-xl rounded-3xl border border-gray-800">
-                    <h3 className="text-lg font-bold text-white mb-4">Top Performer</h3>
-                    <div className="flex items-center gap-6">
-                        <img src="https://ui-avatars.com/api/?name=Liam+Patel&background=random" className="w-20 h-20 rounded-full ring-4 ring-pink-500/20" />
-                        <div>
-                            <p className="text-2xl font-bold text-white">Liam Patel</p>
-                            <p className="text-gray-400">Generated $1,240 this week</p>
-                        </div>
+            {/* Create User Modal */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-700 shadow-2xl p-8 relative max-h-[90vh] overflow-y-auto">
+                        <button onClick={() => setShowModal(false)} className="absolute right-6 top-6 text-gray-400 hover:text-white">
+                            <Trash2 className="rotate-45 w-6 h-6" />
+                        </button>
+
+                        <h2 className="text-2xl font-bold mb-6 text-white">Create New User</h2>
+
+                        <form onSubmit={handleCreateUser} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-gray-400 block mb-1">Full Name</label>
+                                    <input
+                                        type="text" required
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-400 block mb-1">Email</label>
+                                    <input
+                                        type="email" required
+                                        value={formData.email}
+                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-400 block mb-1">Password</label>
+                                    <input
+                                        type="password" required
+                                        value={formData.password}
+                                        onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-400 block mb-1">Phone</label>
+                                    <input
+                                        type="text"
+                                        value={formData.phone}
+                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-gray-400 block mb-1">Role</label>
+                                    <select
+                                        value={formData.role}
+                                        onChange={e => setFormData({ ...formData, role: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-white"
+                                    >
+                                        <option value="User">Staff / User</option>
+                                        {/* Only SuperAdmin can create Admin */}
+                                        {user && user.role === 'SuperAdmin' && <option value="Admin">Admin (Shop Owner)</option>}
+                                        <option value="Manager">Manager</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-400 block mb-1">Position Title</label>
+                                    <input
+                                        type="text" placeholder="e.g. Senior Stylist"
+                                        value={formData.position}
+                                        onChange={e => setFormData({ ...formData, position: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-sm text-gray-400 block mb-2">Granted Permissions</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {availablePermissions.map(perm => (
+                                        <div key={perm.id}
+                                            onClick={() => togglePermission(perm.id)}
+                                            className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${formData.permissions.includes(perm.id)
+                                                ? 'bg-pink-500/20 border-pink-500/50 text-white'
+                                                : 'bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-600'
+                                                }`}
+                                        >
+                                            <span className="text-sm font-medium">{perm.label}</span>
+                                            {formData.permissions.includes(perm.id) && <Check className="w-4 h-4 text-pink-500" />}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-3 rounded-xl font-bold mt-4 hover:opacity-90 transition-opacity text-white">
+                                Create User
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <div className="p-8 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-3xl border border-pink-500/10 backdrop-blur-xl flex items-center justify-between">
-                    <div>
-                        <p className="text-pink-200 font-medium">Total Staff Costs</p>
-                        <p className="text-3xl font-bold text-white mt-2">$4,200 <span className="text-sm font-normal text-gray-400">/ week</span></p>
-                    </div>
-                    <div className="p-4 bg-pink-500/10 rounded-2xl text-pink-400">
-                        <TrendingUp className="w-8 h-8" />
-                    </div>
-                </div>
-            </div>
+            )}
         </div>
     );
 };

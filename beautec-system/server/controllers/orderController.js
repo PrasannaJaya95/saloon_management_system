@@ -30,3 +30,36 @@ exports.getAllOrders = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+// @desc    Delete order
+// @access  Private (Admin/SuperAdmin)
+exports.deleteOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Order not found' });
+        }
+        await order.deleteOne();
+        res.status(200).json({ success: true, message: 'Order deleted' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// @desc    Update order status
+// @access  Private (Admin/SuperAdmin)
+exports.updateOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Order not found' });
+        }
+
+        order.status = req.body.status || order.status;
+        await order.save();
+
+        res.status(200).json({ success: true, data: order });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};

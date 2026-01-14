@@ -2,7 +2,11 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
+import { useShop } from '../context/ShopContext';
+
 const WebsiteLayout = () => {
+    const { settings } = useShop();
+
     return (
         <div className="bg-black min-h-screen text-white font-sans selection:bg-pink-500/30">
             <Navbar />
@@ -12,7 +16,10 @@ const WebsiteLayout = () => {
             <footer className="bg-gray-900 py-12 px-6 border-t border-gray-800">
                 <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
-                        <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">Beautec</h3>
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 flex items-center gap-2">
+                            {settings?.logoUrl && <img src={settings.logoUrl} alt="Logo" className="w-6 h-6 rounded object-cover" />}
+                            {settings?.salonName || 'Beautec'}
+                        </h3>
                         <p className="text-gray-400 text-sm">Experience luxury and wellness redefined. Your personal sanctuary for beauty.</p>
                     </div>
                     <div>
@@ -42,7 +49,7 @@ const WebsiteLayout = () => {
                     </div>
                 </div>
                 <div className="container mx-auto mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-                    © 2026 Beautec Salon. All rights reserved.
+                    © {new Date().getFullYear()} {settings?.salonName || 'Beautec Salon'}. All rights reserved.
                 </div>
             </footer>
         </div>

@@ -13,6 +13,11 @@ const categorySchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    type: {
+        type: String,
+        enum: ['Product', 'Service'],
+        default: 'Product'
     }
 }, { timestamps: true });
 

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const orderController = require('../controllers/orderController');
+const { protect, checkRole } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
 // Products
@@ -11,6 +12,9 @@ router.put('/products/:id', upload.single('image'), productController.updateProd
 
 // Orders
 router.get('/orders', orderController.getAllOrders);
-router.post('/orders', orderController.createOrder);
+router.post('/orders', orderController.createOrder); // Anyone can create orders (public/pos)
+// Restricted Routes
+router.delete('/orders/:id', protect, checkRole(['SuperAdmin', 'Admin']), orderController.deleteOrder);
+router.put('/orders/:id', protect, checkRole(['SuperAdmin', 'Admin']), orderController.updateOrder);
 
 module.exports = router;

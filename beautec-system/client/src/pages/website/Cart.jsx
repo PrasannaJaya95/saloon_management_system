@@ -40,7 +40,7 @@ const Cart = () => {
                                         <img src={item.imageUrl} alt={item.name} className="w-16 h-16 rounded-lg object-cover" />
                                         <div>
                                             <h3 className="font-bold">{item.name}</h3>
-                                            <p className="text-pink-400">${item.price}</p>
+                                            <p className="text-pink-400">Rs. {item.price}</p>
                                         </div>
                                     </div>
                                     <button onClick={() => removeFromCart(idx)} className="text-gray-500 hover:text-red-500">
@@ -54,11 +54,11 @@ const Cart = () => {
                             <h2 className="text-xl font-bold mb-4">Summary</h2>
                             <div className="flex justify-between mb-2 text-gray-400">
                                 <span>Subtotal</span>
-                                <span>${total}</span>
+                                <span>Rs. {total}</span>
                             </div>
                             <div className="flex justify-between font-bold text-xl mb-6">
                                 <span>Total</span>
-                                <span>${total}</span>
+                                <span>Rs. {total}</span>
                             </div>
                             <Link to="/checkout" className="block w-full text-center bg-gradient-to-r from-purple-600 to-pink-600 py-3 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] transition-all">
                                 Proceed to Checkout

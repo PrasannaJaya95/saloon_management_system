@@ -5,7 +5,7 @@ const Shop = () => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/shop/products')
+        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/products`)
             .then(res => res.json())
             .then(data => setProducts(data.data || []))
             .catch(err => console.error(err));
@@ -36,7 +36,7 @@ const Shop = () => {
                             <div className="p-6">
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="text-xl font-bold text-white">{product.name}</h3>
-                                    <span className="bg-pink-500/10 text-pink-400 px-2 py-1 rounded-lg text-sm font-bold">${product.price}</span>
+                                    <span className="bg-pink-500/10 text-pink-400 px-2 py-1 rounded-lg text-sm font-bold">Rs. {product.price}</span>
                                 </div>
                                 <p className="text-gray-400 mb-6 text-sm">{product.description}</p>
                                 <button

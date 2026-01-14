@@ -27,7 +27,7 @@ const Inventory = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/shop/products?admin=true');
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/products?admin=true`);
             const data = await res.json();
             if (data.success) setProducts(data.data);
         } catch (error) {
@@ -37,7 +37,7 @@ const Inventory = () => {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/categories');
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/categories`);
             const data = await res.json();
             if (data.success) setCategories(data.data);
         } catch (error) {
@@ -81,8 +81,8 @@ const Inventory = () => {
         setLoading(true);
         try {
             const url = editingProduct
-                ? `http://localhost:5000/api/shop/products/${editingProduct._id}`
-                : 'http://localhost:5000/api/shop/products';
+                ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/products/${editingProduct._id}`
+                : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/products`;
 
             const method = editingProduct ? 'PUT' : 'POST';
 
@@ -122,7 +122,7 @@ const Inventory = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/categories', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/categories`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newCategory)
@@ -199,7 +199,7 @@ const Inventory = () => {
                                             {product.category}
                                         </span>
                                     </td>
-                                    <td className="p-6 font-bold text-pink-400 text-lg">${product.price}</td>
+                                    <td className="p-6 font-bold text-pink-400 text-lg">Rs. {product.price}</td>
                                     <td className="p-6">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-2.5 h-2.5 rounded-full ${product.stock < 10 ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
@@ -306,7 +306,7 @@ const Inventory = () => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-400">Price ($)</label>
+                                        <label className="text-sm font-medium text-gray-400">Price (Rs.)</label>
                                         <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:border-pink-500 outline-none" />
                                     </div>
                                 </div>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { Users, CreditCard, Calendar, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+    const navigate = useNavigate();
     const stats = [
-        { title: 'Today\'s Revenue', value: '$3,450.00', icon: TrendingUp, trend: '+15%', color: 'from-purple-500 to-pink-500', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+        { title: 'Today\'s Revenue', value: 'Rs. 3,450.00', icon: TrendingUp, trend: '+15%', color: 'from-purple-500 to-pink-500', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
         { title: 'Appointments', value: '24', icon: Calendar, trend: '8 pending', color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
         { title: 'Active Staff', value: '12', icon: Users, trend: 'All checked in', color: 'from-emerald-500 to-teal-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
         { title: 'Total Sales', value: '156', icon: CreditCard, trend: '+2 this hour', color: 'from-orange-500 to-red-500', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
@@ -24,7 +26,13 @@ const Dashboard = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, idx) => (
-                    <div key={idx} className={`p-6 rounded-3xl bg-gray-900/50 backdrop-blur-xl border border-gray-800 hover:border-gray-600 transition-all duration-300 group relative overflow-hidden`}>
+                    <div
+                        key={idx}
+                        onClick={() => {
+                            if (stat.title === "Today's Revenue") navigate('/admin/orders?date=today');
+                        }}
+                        className={`p-6 rounded-3xl bg-gray-900/50 backdrop-blur-xl border border-gray-800 hover:border-gray-600 transition-all duration-300 group relative overflow-hidden ${stat.title === "Today's Revenue" ? 'cursor-pointer hover:bg-gray-800/80 ring-2 ring-transparent hover:ring-pink-500/50' : ''}`}
+                    >
                         <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-3xl -mr-16 -mt-16 transition-opacity group-hover:opacity-10`}></div>
 
                         <div className="flex justify-between items-start mb-6">
@@ -60,7 +68,7 @@ const Dashboard = () => {
                                     className="w-full bg-gradient-to-t from-purple-900/50 to-pink-500/50 rounded-t-lg transition-all duration-500 group-hover:to-pink-400 relative"
                                 >
                                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-gray-700">
-                                        ${h * 100}
+                                        Rs. {h * 100}
                                     </div>
                                 </div>
                             </div>

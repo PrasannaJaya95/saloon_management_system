@@ -9,6 +9,10 @@ const UserSchema = new mongoose.Schema({
         enum: ['SuperAdmin', 'SalonAdmin', 'HRAdmin', 'User'],
         default: 'User'
     },
+    permissions: {
+        type: [String],
+        default: [] // e.g. ['manage_bookings', 'manage_inventory']
+    },
     position: { type: String }, // e.g. Senior Stylist
     phone: { type: String },
     avatar: { type: String },

@@ -15,6 +15,10 @@ import POS from './pages/admin/POS';
 import Staff from './pages/admin/Staff';
 import Inventory from './pages/admin/Inventory';
 import Orders from './pages/admin/Orders';
+import Bookings from './pages/admin/Bookings';
+import Reports from './pages/admin/Reports';
+import Settings from './pages/admin/Settings';
+import Chairs from './pages/admin/Chairs';
 import Login from './pages/auth/Login';
 
 // Protected Route Component
@@ -29,43 +33,49 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+import { ShopProvider } from './context/ShopContext';
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Public Website Routes */}
-          <Route path="/" element={<WebsiteLayout />}>
-            <Route index element={<Home />} />
-            <Route path="booking" element={<Booking />} />
-            <Route path="shop" element={<Shop />} />
-            <Route path="cart" element={<Cart />} />
-            <Route path="checkout" element={<Checkout />} />
-            <Route path="services" element={<div className="p-20 text-center text-white">Services Page Coming Soon</div>} />
-            <Route path="about" element={<div className="p-20 text-center text-white">About Page Coming Soon</div>} />
-            <Route path="contact" element={<div className="p-20 text-center text-white">Contact Page Coming Soon</div>} />
-          </Route>
+        <ShopProvider>
+          <Routes>
+            {/* Public Website Routes */}
+            <Route path="/" element={<WebsiteLayout />}>
+              <Route index element={<Home />} />
+              <Route path="booking" element={<Booking />} />
+              <Route path="shop" element={<Shop />} />
+              <Route path="cart" element={<Cart />} />
+              <Route path="checkout" element={<Checkout />} />
+              <Route path="services" element={<div className="p-20 text-center text-white">Services Page Coming Soon</div>} />
+              <Route path="about" element={<div className="p-20 text-center text-white">About Page Coming Soon</div>} />
+              <Route path="contact" element={<div className="p-20 text-center text-white">Contact Page Coming Soon</div>} />
+            </Route>
 
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
+            {/* Auth Routes */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Admin Dashboard Routes (Protected) */}
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="bookings" element={<div className="p-8 text-white">Bookings Module Coming Soon</div>} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="staff" element={<Staff />} />
-            <Route path="pos" element={<POS />} />
-            <Route path="marketing" element={<div className="p-8 text-white">Marketing Module Coming Soon</div>} />
-            <Route path="inventory" element={<Inventory />} />
-            <Route path="reports" element={<div className="p-8 text-white">Reports Module Coming Soon</div>} />
-          </Route>
-        </Routes>
+            {/* Admin Dashboard Routes (Protected) */}
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="staff" element={<Staff />} />
+              <Route path="pos" element={<POS />} />
+
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="chairs" element={<Chairs />} />
+            </Route>
+          </Routes>
+        </ShopProvider>
       </AuthProvider>
     </BrowserRouter>
   );

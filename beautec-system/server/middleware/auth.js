@@ -7,7 +7,7 @@ const protect = (req, res, next) => {
     if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'beautec_fallback_secret_2024');
         req.user = decoded.id ? decoded : decoded.user; // Adjust based on how token was signed (id vs user object)
         // In authController I signed with { id }, so verified token will be { id, iat, exp }
         // Let's standardise on attaching the whole user or just ID.

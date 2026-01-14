@@ -1,27 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Calendar, User, Search, Filter, ChevronRight, Eye } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ShoppingBag, Calendar, User, Search, Filter, ChevronRight, Eye, Trash2, Edit2, CheckCircle, XCircle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 
 const Orders = () => {
+    const { user } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await fetch('http://localhost:5000/api/shop/orders');
-                const data = await res.json();
-                if (data.success) {
-                    setOrders(data.data);
-                }
-            } catch (error) {
-                console.error("Failed to fetch orders", error);
-            } finally {
-                setLoading(false);
+    const fetchOrders = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/orders`);
+            const data = await res.json();
+            if (data.success) {
+                setOrders(data.data);
             }
-        };
+        } catch (error) {
+            console.error("Failed to fetch orders", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
         fetchOrders();
     }, []);
+
+    // Filter Logic
+    const filteredOrders = useMemo(() => {
+        let result = orders;
+        const sourceParam = searchParams.get('source');
+        const dateParam = searchParams.get('date');
+
+        if (sourceParam) {
+            result = result.filter(o => o.source === sourceParam);
+        }
+
+        if (dateParam === 'today') {
+            const todayStr = new Date().toDateString();
+            result = result.filter(o => new Date(o.createdAt).toDateString() === todayStr);
+        }
+
+        return result;
+    }, [orders, searchParams]);
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this order?')) return;
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/orders/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchOrders();
+            } else {
+                alert(data.error || 'Failed to delete');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleUpdateStatus = async (id, currentStatus) => {
+        const newStatus = currentStatus === 'Pending' ? 'Paid' : 'Pending';
+        // Simple toggle for demo. In real app, maybe a dropdown.
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/orders/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchOrders();
+            } else {
+                alert(data.error || 'Update failed');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     if (loading) return <div className="text-white">Loading orders...</div>;
 
@@ -58,7 +122,7 @@ const Orders = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800">
-                        {orders.map((order) => (
+                        {filteredOrders.map((order) => (
                             <tr key={order._id} className="group hover:bg-white/5 transition-colors">
                                 <td className="p-6 text-sm font-medium text-white/80 font-mono">#{order._id.slice(-6).toUpperCase()}</td>
                                 <td className="p-6">
@@ -91,11 +155,31 @@ const Orders = () => {
                                         {order.status}
                                     </span>
                                 </td>
-                                <td className="p-6 text-sm font-bold text-white">${order.totalAmount}</td>
+                                <td className="p-6 text-sm font-bold text-white">Rs. {order.totalAmount}</td>
                                 <td className="p-6">
-                                    <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
-                                        <Eye className="w-4 h-4" />
-                                    </button>
+                                    <div className="flex gap-2">
+                                        {(user?.role === 'SuperAdmin' || user?.role === 'Admin') && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(order._id, order.status)}
+                                                    className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all"
+                                                    title="Toggle Status"
+                                                >
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(order._id)}
+                                                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                                    title="Delete Order"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </>
+                                        )}
+                                        <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
+                                            <Eye className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
