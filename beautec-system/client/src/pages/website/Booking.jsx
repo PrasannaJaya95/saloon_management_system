@@ -30,7 +30,7 @@ const Booking = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const API_BASE = 'http://192.168.1.8:5000';
+            const API_BASE = import.meta.env.VITE_API_URL || 'http://192.168.1.8:5000';
             try {
                 const sRes = await fetch(`${API_BASE}/api/services`);
                 const sData = await sRes.json();

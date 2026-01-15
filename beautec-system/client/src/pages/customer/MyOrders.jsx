@@ -10,7 +10,7 @@ const MyOrders = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch('http://192.168.1.8:5000/api/shop/orders/myorders', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/shop/orders/myorders`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {
