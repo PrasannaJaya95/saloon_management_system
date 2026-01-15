@@ -56,4 +56,5 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/beautec_db'
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-// Restart Trigger 2
+
+module.exports = app;
