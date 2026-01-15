@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const BookingSchema = new mongoose.Schema({
     clientName: { type: String, required: true },
     clientPhone: { type: String, required: true },
+    clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Link to registered user
     services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Service' }], // Array of services
     // serviceName removed as it will be dynamic or redundant for multi-service
     totalPrice: { type: Number },

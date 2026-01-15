@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Calendar as CalendarIcon, Clock, User, CheckCircle, Armchair, Scissors, ChevronRight, X } from 'lucide-react';
 import { createBooking } from '../../services/api';
 import { DayPicker } from 'react-day-picker';
@@ -6,7 +7,8 @@ import { format } from 'date-fns';
 import 'react-day-picker/dist/style.css';
 
 const Booking = () => {
-    const [step, setStep] = useState(1); // 1: Services, 2: Station, 3: DateTime, 4: Details
+    const [searchParams] = useSearchParams();
+    const [step, setStep] = useState(1); // 1: Services, 2: Chair, 3: DateTime, 4: Details
     const [status, setStatus] = useState('idle');
 
     // Data
@@ -20,6 +22,7 @@ const Booking = () => {
     const [timeSlot, setTimeSlot] = useState('');
     const [availableSlots, setAvailableSlots] = useState([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     // Details
     const [clientName, setClientName] = useState('');
@@ -27,11 +30,20 @@ const Booking = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const API_BASE = 'http://localhost:5000';
+            const API_BASE = 'http://192.168.1.8:5000';
             try {
                 const sRes = await fetch(`${API_BASE}/api/services`);
                 const sData = await sRes.json();
-                if (sData.success) setServices(sData.data);
+                if (sData.success) {
+                    setServices(sData.data);
+
+                    // Pre-select service from URL
+                    const serviceId = searchParams.get('serviceId');
+                    if (serviceId) {
+                        const exists = sData.data.find(s => s._id === serviceId);
+                        if (exists) setSelectedServiceIds([serviceId]);
+                    }
+                }
 
                 const cRes = await fetch(`${API_BASE}/api/chairs`);
                 const cData = await cRes.json();
@@ -73,7 +85,7 @@ const Booking = () => {
         setAvailableSlots([]);
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings/available-slots?date=${dateStr}&chairId=${selectedChair._id}&duration=${totalDuration}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.8:5000'}/api/bookings/available-slots?date=${dateStr}&chairId=${selectedChair._id}&duration=${totalDuration}`);
             const data = await res.json();
             if (data.success) {
                 setAvailableSlots(data.data);
@@ -87,6 +99,7 @@ const Booking = () => {
 
     const handleDateSelect = (date) => {
         setSelectedDate(date);
+        setIsCalendarOpen(false); // Close popup
         setTimeSlot('');
         if (date) fetchSlots(date);
     };
@@ -145,7 +158,7 @@ const Booking = () => {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white pt-24 pb-12 px-4">
+        <div className="min-h-screen bg-transparent text-white pt-24 pb-12 px-4">
             <style>{css}</style>
             <div className="container mx-auto max-w-5xl">
 
@@ -155,7 +168,7 @@ const Booking = () => {
                     <div className="flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap">
                         <span className={step >= 1 ? "text-pink-400 font-bold" : ""}>Services</span>
                         <ChevronRight className="w-4 h-4 flex-shrink-0" />
-                        <span className={step >= 2 ? "text-pink-400 font-bold" : ""}>Station</span>
+                        <span className={step >= 2 ? "text-pink-400 font-bold" : ""}>Chair</span>
                         <ChevronRight className="w-4 h-4 flex-shrink-0" />
                         <span className={step >= 3 ? "text-pink-400 font-bold" : ""}>Date & Time</span>
                         <ChevronRight className="w-4 h-4 flex-shrink-0" />
@@ -196,17 +209,17 @@ const Booking = () => {
                                         disabled={selectedServiceIds.length === 0}
                                         onClick={() => setStep(2)}
                                         className="bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-500 text-white px-6 py-2 rounded-xl font-bold transition-all hover:scale-105"
-                                    >Next: Select Station</button>
+                                    >Select Chair</button>
                                 </div>
                             </div>
                         )}
 
-                        {/* STEP 2: STATION */}
+                        {/* STEP 2: CHAIR */}
                         {step === 2 && (
                             <div className="bg-gray-900/50 p-6 rounded-3xl border border-gray-800 animate-in fade-in slide-in-from-left-4">
                                 <div className="flex justify-between items-center mb-4">
                                     <h2 className="text-xl font-bold flex items-center gap-2">
-                                        <Armchair className="text-pink-400" /> Select Station
+                                        <Armchair className="text-pink-400" /> Select Chair
                                     </h2>
                                     <button onClick={() => setStep(1)} className="text-sm text-gray-500 hover:text-white">Change Services</button>
                                 </div>
@@ -229,7 +242,7 @@ const Booking = () => {
                                     </div>
                                 ) : (
                                     <div className="text-center p-8 text-gray-500">
-                                        No stations support all selected services together. Please try selecting fewer services.
+                                        No chairs support all selected services together. Please try selecting fewer services.
                                     </div>
                                 )}
 
@@ -238,7 +251,7 @@ const Booking = () => {
                                         disabled={!selectedChair}
                                         onClick={() => setStep(3)}
                                         className="bg-pink-600 disabled:opacity-50 hover:bg-pink-500 text-white px-6 py-2 rounded-xl font-bold transition-all hover:scale-105"
-                                    >Next: Select Date & Time</button>
+                                    >Select Date & Time</button>
                                 </div>
                             </div>
                         )}
@@ -250,19 +263,41 @@ const Booking = () => {
                                     <h2 className="text-xl font-bold flex items-center gap-2">
                                         <CalendarIcon className="text-blue-400" /> Select Date & Time
                                     </h2>
-                                    <button onClick={() => setStep(2)} className="text-sm text-gray-500 hover:text-white">Change Station</button>
+                                    <button onClick={() => setStep(2)} className="text-sm text-gray-500 hover:text-white">Change Chair</button>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     {/* CALENDAR */}
-                                    <div className="bg-gray-950 p-4 rounded-2xl border border-gray-800 flex justify-center">
-                                        <DayPicker
-                                            mode="single"
-                                            selected={selectedDate}
-                                            onSelect={handleDateSelect}
-                                            disabled={{ before: new Date() }}
-                                            defaultMonth={new Date()}
-                                        />
+                                    {/* CALENDAR POPUP TRIGGER */}
+                                    <div className="bg-gray-950 p-4 rounded-2xl border border-gray-800">
+                                        <label className="text-sm font-medium text-gray-400 mb-2 block">Select Date</label>
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                                                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${isCalendarOpen || selectedDate
+                                                    ? 'bg-gray-900 border-blue-500 text-white'
+                                                    : 'bg-gray-950 border-gray-800 text-gray-500 hover:border-gray-700'
+                                                    }`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <CalendarIcon className="w-5 h-5 text-blue-400" />
+                                                    {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Pick a date'}
+                                                </span>
+                                            </button>
+
+                                            {/* POPUP */}
+                                            {isCalendarOpen && (
+                                                <div className="absolute top-full left-0 mt-2 z-50 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-4 animate-in fade-in zoom-in-95">
+                                                    <DayPicker
+                                                        mode="single"
+                                                        selected={selectedDate}
+                                                        onSelect={handleDateSelect}
+                                                        disabled={{ before: new Date() }}
+                                                        defaultMonth={selectedDate || new Date()}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {/* SLOTS */}
@@ -294,7 +329,7 @@ const Booking = () => {
                                                 </div>
                                             ) : (
                                                 <div className="text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">
-                                                    No slots available for {totalDuration} min duration. Try another date or station.
+                                                    No slots available for {totalDuration} min duration. Try another date or chair.
                                                 </div>
                                             )
                                         ) : (
@@ -310,7 +345,7 @@ const Booking = () => {
                                         disabled={!timeSlot || !selectedDate}
                                         onClick={() => setStep(4)}
                                         className="bg-blue-600 disabled:opacity-50 hover:bg-blue-500 text-white px-6 py-2 rounded-xl font-bold transition-all hover:scale-105"
-                                    >Next: Final Details</button>
+                                    >Final Details</button>
                                 </div>
                             </div>
                         )}
@@ -386,7 +421,7 @@ const Booking = () => {
                                     <Armchair className="w-5 h-5 text-gray-500" />
                                     <div>
                                         <div className="text-sm font-bold text-white">{selectedChair.name}</div>
-                                        <div className="text-xs text-gray-500">Station</div>
+                                        <div className="text-xs text-gray-500">Chair</div>
                                     </div>
                                 </div>
                             )}

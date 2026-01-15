@@ -244,3 +244,61 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+// @desc    Change user password
+// @route   PUT /api/auth/profile/password
+// @access  Private
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verify current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect current password' });
+        }
+
+        // Hash new password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Upload user avatar
+// @route   PUT /api/auth/profile/avatar
+// @access  Private
+exports.uploadAvatar = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Please upload a file' });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Construct full URL (assuming uploads are served statically)
+        // Adjust request protocol/host as needed or store relative path
+        const avatarUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+        user.avatar = avatarUrl;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Avatar updated successfully',
+            avatar: avatarUrl
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

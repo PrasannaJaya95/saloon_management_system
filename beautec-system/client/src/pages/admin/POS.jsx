@@ -16,7 +16,7 @@ const POS = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/products?pos=true`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.8:5000'}/api/shop/products?pos=true`);
             const data = await res.json();
             if (data.success) setProducts(data.data);
         } catch (error) { console.error(error); }
@@ -24,7 +24,7 @@ const POS = () => {
 
     const fetchServices = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/services`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.8:5000'}/api/services`);
             const data = await res.json();
             if (data.success) setServices(data.data);
         } catch (error) { console.error(error); }

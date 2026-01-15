@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const OrderSchema = new mongoose.Schema({
     customerName: { type: String, required: true },
     customerEmail: { type: String, required: true },
+    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Link to registered user
     items: [{
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service' },

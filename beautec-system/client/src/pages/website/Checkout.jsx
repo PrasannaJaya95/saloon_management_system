@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 import { CreditCard, Lock } from 'lucide-react';
 
 const Checkout = () => {
     const navigate = useNavigate();
-    const [cart, setCart] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('Card'); // Default to Card for online
-    const [paymentRef, setPaymentRef] = useState('');
+    const { cart, clearCart } = useCart();
 
+    // Redirect if empty
     useEffect(() => {
-        const items = JSON.parse(localStorage.getItem('cart') || '[]');
-        setCart(items);
-        if (items.length === 0) navigate('/shop');
-    }, [navigate]);
+        if (cart.length === 0) navigate('/shop');
+    }, [cart, navigate]);
 
     const total = cart.reduce((sum, item) => sum + item.price, 0);
 
@@ -49,7 +46,7 @@ const Checkout = () => {
             const data = await res.json();
 
             if (data.success) {
-                localStorage.removeItem('cart');
+                clearCart();
                 alert('Payment Successful! Order Confirmed.');
                 navigate('/');
             } else {
@@ -64,7 +61,7 @@ const Checkout = () => {
     };
 
     return (
-        <div className="bg-black min-h-screen pt-24 pb-12 px-6 text-white">
+        <div className="bg-transparent min-h-screen pt-24 pb-12 px-6 text-white">
             <div className="container mx-auto max-w-2xl">
                 <div className="flex items-center gap-2 mb-8 text-gray-400">
                     <Lock className="w-4 h-4" />

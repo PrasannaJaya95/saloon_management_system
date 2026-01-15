@@ -16,10 +16,15 @@ export const ShopProvider = ({ children }) => {
 
     const fetchSettings = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.8:5000'}/api/settings`);
             const data = await res.json();
             if (data.success) {
-                setSettings(data.data);
+                // Fix Logo URL for mobile access (replace localhost with actual IP if needed)
+                let fixedSettings = data.data;
+                if (fixedSettings.logoUrl && fixedSettings.logoUrl.includes('localhost')) {
+                    fixedSettings.logoUrl = fixedSettings.logoUrl.replace('localhost', window.location.hostname);
+                }
+                setSettings(fixedSettings);
             }
         } catch (error) {
             console.error("Failed to fetch shop settings", error);

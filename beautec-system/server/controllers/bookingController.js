@@ -4,6 +4,19 @@ const Terminal = require('../models/Terminal');
 const User = require('../models/User');
 const { sendWhatsAppMessage } = require('../services/whatsappService');
 
+// Get logged-in user's bookings
+exports.getMyBookings = async (req, res) => {
+    try {
+        const bookings = await Booking.find({ clientId: req.user._id })
+            .populate('services')
+            .populate('staffId', 'name')
+            .sort({ date: -1, startTime: -1 });
+        res.json(bookings);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 exports.createBooking = async (req, res) => {
     try {
         const { clientName, clientPhone, services, date, time, chairId, staffId } = req.body;
@@ -39,6 +52,7 @@ exports.createBooking = async (req, res) => {
         const newBooking = new Booking({
             clientName,
             clientPhone,
+            clientId: req.user ? req.user._id : undefined, // Link if logged in
             services: selectedServices.map(s => s._id),
             totalPrice,
             totalDuration,

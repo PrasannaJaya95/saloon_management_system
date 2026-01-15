@@ -10,7 +10,7 @@ const Inventory = () => {
     // Product Form State
     const [editingProduct, setEditingProduct] = useState(null);
     const [formData, setFormData] = useState({
-        name: '', category: '', price: '', stock: '', description: '', showInWebsite: true, showInPOS: true
+        itemNumber: '', name: '', category: '', price: '', stock: '', description: '', showInWebsite: true, showInPOS: true, relatedProducts: []
     });
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -49,19 +49,21 @@ const Inventory = () => {
         if (product) {
             setEditingProduct(product);
             setFormData({
+                itemNumber: product.itemNumber || '',
                 name: product.name,
                 category: product.categoryId || '', // Use ID for selection
                 price: product.price,
                 stock: product.stock,
                 description: product.description,
                 showInWebsite: product.showInWebsite,
-                showInPOS: product.showInPOS
+                showInPOS: product.showInPOS,
+                relatedProducts: product.relatedProducts || []
             });
             setImagePreview(product.imageUrl);
             setImageFile(null);
         } else {
             setEditingProduct(null);
-            setFormData({ name: '', category: '', price: '', stock: '', description: '', showInWebsite: true, showInPOS: true });
+            setFormData({ itemNumber: '', name: '', category: '', price: '', stock: '', description: '', showInWebsite: true, showInPOS: true, relatedProducts: [] });
             setImagePreview(null);
             setImageFile(null);
         }
@@ -87,6 +89,7 @@ const Inventory = () => {
             const method = editingProduct ? 'PUT' : 'POST';
 
             const data = new FormData();
+            data.append('itemNumber', formData.itemNumber);
             data.append('name', formData.name);
             data.append('category', formData.category);
             data.append('price', formData.price);
@@ -96,6 +99,9 @@ const Inventory = () => {
             data.append('showInPOS', formData.showInPOS);
             if (imageFile) {
                 data.append('image', imageFile);
+            }
+            if (formData.relatedProducts) {
+                data.append('relatedProducts', JSON.stringify(formData.relatedProducts));
             }
 
             const res = await fetch(url, {
@@ -167,6 +173,7 @@ const Inventory = () => {
                         <thead>
                             <tr className="bg-gray-950/50 text-gray-400 text-sm uppercase tracking-wider">
                                 <th className="p-6 font-semibold">Product</th>
+                                <th className="p-6 font-semibold">Item #</th>
                                 <th className="p-6 font-semibold">Category</th>
                                 <th className="p-6 font-semibold">Price</th>
                                 <th className="p-6 font-semibold">Stock</th>
@@ -193,6 +200,11 @@ const Inventory = () => {
                                                 <div className="text-sm text-gray-500 max-w-[200px] truncate">{product.description}</div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td className="p-6">
+                                        <span className="px-3 py-1 rounded-full bg-gray-800 text-gray-300 text-sm border border-gray-700 min-w-[80px] text-center inline-block">
+                                            {product.itemNumber || '-'}
+                                        </span>
                                     </td>
                                     <td className="p-6">
                                         <span className="px-3 py-1 rounded-full bg-gray-800 text-gray-300 text-sm border border-gray-700">
@@ -276,9 +288,15 @@ const Inventory = () => {
 
                                 {/* Fields */}
                                 <div className="w-2/3 space-y-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-400">Product Name</label>
-                                        <input type="text" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none transition-all" placeholder="e.g. Luxury Shampoo" />
+                                    <div className="grid grid-cols-3 gap-6">
+                                        <div className="space-y-2 col-span-1">
+                                            <label className="text-sm font-medium text-gray-400">Item No.</label>
+                                            <input type="text" value={formData.itemNumber} onChange={e => setFormData({ ...formData, itemNumber: e.target.value })} className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:border-pink-500 outline-none" placeholder="SKU-001" />
+                                        </div>
+                                        <div className="space-y-2 col-span-2">
+                                            <label className="text-sm font-medium text-gray-400">Product Name</label>
+                                            <input type="text" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none transition-all" placeholder="e.g. Luxury Shampoo" />
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-6">
@@ -323,7 +341,6 @@ const Inventory = () => {
                                     <label className="flex items-center gap-3 cursor-pointer group">
                                         <div className={`w-6 h-6 rounded border flex items-center justify-center transition-colors ${formData.showInWebsite ? 'bg-pink-600 border-pink-600' : 'border-gray-600 bg-gray-900'}`}>
                                             {formData.showInWebsite && <Plus className="w-4 h-4 text-white rotate-45 transform" />}
-                                            {/* (Simulating checkmark with rotated plus for now, or just use built-in checkbox hidden) */}
                                             <input type="checkbox" checked={formData.showInWebsite} onChange={e => setFormData({ ...formData, showInWebsite: e.target.checked })} className="hidden" />
                                         </div>
                                         <span className={`text-sm font-medium transition-colors ${formData.showInWebsite ? 'text-white' : 'text-gray-500'}`}>Show in Website</span>
@@ -336,6 +353,39 @@ const Inventory = () => {
                                         </div>
                                         <span className={`text-sm font-medium transition-colors ${formData.showInPOS ? 'text-white' : 'text-gray-500'}`}>Show in POS</span>
                                     </label>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-sm font-medium text-gray-400">Related Products</label>
+                                <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto custom-scrollbar p-1">
+                                    {products.filter(p => p._id !== editingProduct?._id).map(prod => {
+                                        const isSelected = formData.relatedProducts?.includes(prod._id);
+                                        return (
+                                            <div
+                                                key={prod._id}
+                                                onClick={() => {
+                                                    const current = formData.relatedProducts || [];
+                                                    const updated = isSelected
+                                                        ? current.filter(id => id !== prod._id)
+                                                        : [...current, prod._id];
+                                                    setFormData({ ...formData, relatedProducts: updated });
+                                                }}
+                                                className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${isSelected
+                                                    ? 'bg-purple-600/20 border-purple-500'
+                                                    : 'bg-gray-950 border-gray-800 hover:border-gray-700'
+                                                    }`}
+                                            >
+                                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-purple-500 border-purple-500' : 'border-gray-600'}`}>
+                                                    {isSelected && <Plus className="w-3 h-3 text-white rotate-45" />}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-gray-400'}`}>{prod.name}</p>
+                                                    <p className="text-xs text-gray-600">Rs. {prod.price}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 

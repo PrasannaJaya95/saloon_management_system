@@ -29,10 +29,11 @@ const Login = () => {
 
         setLoading(false);
         if (res.success) {
-            if (res.role === 'SuperAdmin' || res.role === 'Admin') {
+            if (res.role === 'SuperAdmin' || res.role === 'Admin' || res.role === 'SalonAdmin' || res.role === 'HRAdmin') {
                 navigate('/admin/dashboard');
             } else {
-                navigate('/');
+                // Regular users go to the portal (Simplified URL)
+                navigate('/dashboard');
             }
         } else {
             setError(res.message);
