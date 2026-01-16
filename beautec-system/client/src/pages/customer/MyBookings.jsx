@@ -11,7 +11,11 @@ const MyBookings = () => {
     useEffect(() => {
         const fetchBookings = async () => {
             try {
+<<<<<<< HEAD
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/my-bookings`, {
+=======
+                const response = await fetch('${import.meta.env.VITE_API_URL}/api/bookings/my-bookings', {
+>>>>>>> 2d82a3d91cfc6eb8e0cc660b141703aa58f5ceaa
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

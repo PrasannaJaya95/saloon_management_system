@@ -8,7 +8,8 @@ exports.getTeamMembers = async (req, res, next) => {
         const members = await TeamMember.find().sort({ createdAt: -1 });
         res.status(200).json({ success: true, count: members.length, data: members });
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Server Error' });
+        console.error("Team API Error:", err);
+        res.status(500).json({ success: false, message: err.message || 'Server Error' });
     }
 };
 

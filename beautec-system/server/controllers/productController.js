@@ -88,7 +88,7 @@ exports.createProduct = async (req, res) => {
         // Handle Image Upload
         let imageUrl = '';
         if (req.file) {
-            imageUrl = req.file.filename;
+            imageUrl = req.file.path; // Use Cloudinary URL
         } else if (req.body.imageUrl) {
             imageUrl = req.body.imageUrl;
         }
@@ -100,6 +100,11 @@ exports.createProduct = async (req, res) => {
             showInPOS: req.body.showInPOS === 'true' || req.body.showInPOS === true,
             relatedProducts: req.body.relatedProducts ? JSON.parse(req.body.relatedProducts) : []
         };
+
+        // Fix for unique sparse index: Remove field if empty
+        if (productData.itemNumber === "" || productData.itemNumber === null) {
+            delete productData.itemNumber;
+        }
 
         const product = await Product.create(productData);
         res.status(201).json({ success: true, data: product });
@@ -118,7 +123,7 @@ exports.updateProduct = async (req, res) => {
         // Handle Image Update
         let imageUrl = product.imageUrl;
         if (req.file) {
-            imageUrl = req.file.filename;
+            imageUrl = req.file.path; // Use Cloudinary URL
         }
 
         const updateData = {
@@ -128,6 +133,11 @@ exports.updateProduct = async (req, res) => {
             showInPOS: req.body.showInPOS === 'true' || req.body.showInPOS === true,
             relatedProducts: req.body.relatedProducts ? JSON.parse(req.body.relatedProducts) : product.relatedProducts
         };
+
+        // Fix for unique sparse index: Remove field if empty
+        if (updateData.itemNumber === "" || updateData.itemNumber === null) {
+            delete updateData.itemNumber;
+        }
 
         product = await Product.findByIdAndUpdate(req.params.id, updateData, {
             new: true,

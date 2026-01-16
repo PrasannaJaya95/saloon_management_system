@@ -6,13 +6,21 @@ import { Lock, Mail, ShieldAlert, ArrowRight, Eye, EyeOff } from 'lucide-react';
 const AdminLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [selectedRole, setSelectedRole] = useState('Admin'); // Default role
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const { login } = useAuth();
-    const useNavigate = useNavigate(); // Shadow variable? No, I should simply use the imported hook. Fixed below.
     const navigateHook = useNavigate();
+
+    const roles = [
+        { id: 'SuperAdmin', label: 'Super Admin' },
+        { id: 'Admin', label: 'Admin' },
+        { id: 'SalonAdmin', label: 'Salon Admin' },
+        { id: 'HRAdmin', label: 'HR Admin' },
+        { id: 'Manager', label: 'Manager' }
+    ];
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,16 +31,23 @@ const AdminLogin = () => {
         setLoading(false);
 
         if (res.success) {
-            // STRICT ROLE CHECK FOR ADMIN PORTAL
+            // 1. Check if the user is allowed in the admin portal at all
             const allowedRoles = ['SuperAdmin', 'Admin', 'SalonAdmin', 'HRAdmin', 'Manager'];
-            if (allowedRoles.includes(res.role)) {
-                navigateHook('/admin/dashboard');
-            } else {
-                // If a customer tries to log in here, we deny access even if credentials are valid
+
+            if (!allowedRoles.includes(res.role)) {
                 setError('Access Denied: You are not authorized to access the Admin Portal.');
-                // Optional: Logout immediately to clear the invalid session
-                // logout(); 
+                return;
             }
+
+            // 2. Check if the user's actual role matches the SELECTED role
+            if (res.role !== selectedRole) {
+                setError(`Access Denied: You are not a ${roles.find(r => r.id === selectedRole)?.label || selectedRole}. Your role is ${res.role}.`);
+                return;
+            }
+
+            // 3. Navigate if all checks pass
+            navigateHook('/admin/dashboard');
+
         } else {
             setError(res.message);
         }
@@ -60,6 +75,25 @@ const AdminLogin = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Role Selection Dropdown */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-400 ml-1">Login As</label>
+                        <div className="relative">
+                            <select
+                                value={selectedRole}
+                                onChange={(e) => setSelectedRole(e.target.value)}
+                                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none transition-all appearance-none cursor-pointer"
+                            >
+                                {roles.map(role => (
+                                    <option key={role.id} value={role.id}>{role.label}</option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-3.5 pointer-events-none text-gray-500">
+                                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-400 ml-1">Email Address</label>
                         <div className="relative">
