@@ -48,22 +48,22 @@ const CustomerDashboard = () => {
 
                 {/* Quick Quick Actions */}
                 <div className="md:col-span-2 grid grid-cols-2 gap-4">
-                    <Link to="/booking" className="p-6 rounded-3xl bg-gradient-to-br from-pink-600/20 to-purple-600/20 backdrop-blur-md border border-pink-500/30 hover:border-pink-500/60 transition-all hover:scale-[1.02] group flex flex-col justify-between">
+                    <Link to="/my-bookings" className="p-6 rounded-3xl bg-gradient-to-br from-pink-600/20 to-purple-600/20 backdrop-blur-md border border-pink-500/30 hover:border-pink-500/60 transition-all hover:scale-[1.02] group flex flex-col justify-between">
                         <div className="p-3 bg-pink-500/20 rounded-xl w-fit mb-4 text-pink-400 group-hover:text-pink-300">
                             <Calendar className="w-8 h-8" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-white mb-1">Book Appointment</h3>
+                            <h3 className="text-xl font-bold text-white mb-1">Appointment Summary</h3>
                             <p className="text-sm text-gray-400">Schedule your next session</p>
                         </div>
                     </Link>
 
-                    <Link to="/shop" className="p-6 rounded-3xl bg-gradient-to-br from-blue-600/20 to-cyan-600/20 backdrop-blur-md border border-blue-500/30 hover:border-blue-500/60 transition-all hover:scale-[1.02] group flex flex-col justify-between">
+                    <Link to="/my-orders" className="p-6 rounded-3xl bg-gradient-to-br from-blue-600/20 to-cyan-600/20 backdrop-blur-md border border-blue-500/30 hover:border-blue-500/60 transition-all hover:scale-[1.02] group flex flex-col justify-between">
                         <div className="p-3 bg-blue-500/20 rounded-xl w-fit mb-4 text-blue-400 group-hover:text-blue-300">
                             <ShoppingBag className="w-8 h-8" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-white mb-1">Shop Products</h3>
+                            <h3 className="text-xl font-bold text-white mb-1">Shop Product Summary</h3>
                             <p className="text-sm text-gray-400">Browse premium care items</p>
                         </div>
                     </Link>
@@ -76,7 +76,7 @@ const CustomerDashboard = () => {
                 <div className="p-8 rounded-3xl bg-gray-900/40 backdrop-blur-xl border border-white/5">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-bold">Upcoming Appointments</h3>
-                        <Link to="/portal/bookings" className="text-sm text-pink-400 hover:text-pink-300">View All</Link>
+                        <Link to="/my-bookings" className="text-sm text-pink-400 hover:text-pink-300">View All</Link>
                     </div>
 
                     {/* Placeholder for fetching real data */}
@@ -109,7 +109,7 @@ const CustomerDashboard = () => {
                 <div className="p-8 rounded-3xl bg-gray-900/40 backdrop-blur-xl border border-white/5">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-bold">Recent Orders</h3>
-                        <Link to="/portal/orders" className="text-sm text-pink-400 hover:text-pink-300">View All</Link>
+                        <Link to="/my-orders" className="text-sm text-pink-400 hover:text-pink-300">View All</Link>
                     </div>
 
                     <div className="space-y-4">

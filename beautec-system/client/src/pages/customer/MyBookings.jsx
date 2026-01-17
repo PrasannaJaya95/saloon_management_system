@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const MyBookings = () => {
@@ -10,7 +11,6 @@ const MyBookings = () => {
     const [error, setError] = useState(null);
     const [filterStatus, setFilterStatus] = useState('All');
     const [filterDate, setFilterDate] = useState('');
-    const [searchName, setSearchName] = useState('');
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -65,31 +65,19 @@ const MyBookings = () => {
             matchDate = bDate === filterDate;
         }
 
-        // Name Search
-        let matchName = true;
-        if (searchName) {
-            matchName = booking.clientName?.toLowerCase().includes(searchName.toLowerCase());
-        }
-
-        return matchStatus && matchDate && matchName;
+        return matchStatus && matchDate;
     });
 
     return (
         <div className="space-y-6">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                 <h1 className="text-3xl font-bold text-white">My Bookings</h1>
+                <Link to="/booking" className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                    <Plus className="w-5 h-5" />
+                    New Booking
+                </Link>
 
                 <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
-                    {/* Name Search */}
-                    <div className="relative w-full md:w-auto">
-                        <input
-                            type="text"
-                            placeholder="Search client name..."
-                            value={searchName}
-                            onChange={(e) => setSearchName(e.target.value)}
-                            className="bg-gray-900/60 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-white outline-none focus:border-pink-500 transition-all placeholder:text-gray-600 w-full md:w-64"
-                        />
-                    </div>
 
                     {/* Date Filter */}
                     <input
@@ -106,8 +94,8 @@ const MyBookings = () => {
                                 key={status}
                                 onClick={() => setFilterStatus(status)}
                                 className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${filterStatus === status
-                                        ? 'bg-pink-600 text-white shadow-lg'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-pink-600 text-white shadow-lg'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {status}

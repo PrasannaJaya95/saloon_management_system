@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Package, Truck, Check } from 'lucide-react';
+import { ShoppingBag, Package, Truck, Check, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const MyOrders = () => {
@@ -9,7 +10,6 @@ const MyOrders = () => {
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('All');
     const [filterDate, setFilterDate] = useState('');
-    const [searchName, setSearchName] = useState('');
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -49,31 +49,19 @@ const MyOrders = () => {
             matchDate = oDate === filterDate;
         }
 
-        // Name Search
-        let matchName = true;
-        if (searchName) {
-            matchName = order.customerName?.toLowerCase().includes(searchName.toLowerCase());
-        }
-
-        return matchStatus && matchDate && matchName;
+        return matchStatus && matchDate;
     });
 
     return (
         <div className="space-y-6">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                 <h1 className="text-3xl font-bold text-white">My Orders</h1>
+                <Link to="/shop" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                    <Plus className="w-5 h-5" />
+                    Shop Now
+                </Link>
 
                 <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
-                    {/* Name Search */}
-                    <div className="relative w-full md:w-auto">
-                        <input
-                            type="text"
-                            placeholder="Search customer name..."
-                            value={searchName}
-                            onChange={(e) => setSearchName(e.target.value)}
-                            className="bg-gray-900/60 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-white outline-none focus:border-purple-500 transition-all placeholder:text-gray-600 w-full md:w-64"
-                        />
-                    </div>
 
                     {/* Date Filter */}
                     <input
@@ -90,8 +78,8 @@ const MyOrders = () => {
                                 key={status}
                                 onClick={() => setFilterStatus(status)}
                                 className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${filterStatus === status
-                                        ? 'bg-purple-600 text-white shadow-lg'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-purple-600 text-white shadow-lg'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {status}
