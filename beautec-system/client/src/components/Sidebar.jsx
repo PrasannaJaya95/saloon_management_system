@@ -152,6 +152,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
                     <span className="font-medium">Settings</span>
                 </NavLink>
+                <NavLink to="/" className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all group ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-black font-medium hover:bg-white hover:text-purple-700 shadow-sm'}`}>
+                    <Globe className="w-5 h-5 group-hover:rotate-12 transition-transform duration-500" />
+                    <span className="font-medium">Back to Website</span>
+                </NavLink>
                 <button onClick={handleLogout} className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-colors ${theme === 'dark' ? 'text-gray-400 hover:bg-red-500/10 hover:text-red-500' : 'text-black font-medium hover:bg-red-100 hover:text-red-700'}`}>
                     <LogOut className="w-5 h-5" />
                     <span className="font-medium">Logout</span>

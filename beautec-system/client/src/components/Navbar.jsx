@@ -39,7 +39,7 @@ const Navbar = () => {
                         <img src={settings.logoUrl} alt="Logo" className="h-12 w-auto object-contain" />
                     ) : (
                         <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                            {settings?.salonName || 'Beautec'}
+                            {settings?.salonName || 'Salonix'}
                         </span>
                     )}
                 </Link>

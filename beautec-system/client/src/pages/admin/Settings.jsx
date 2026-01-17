@@ -488,7 +488,7 @@ const Settings = () => {
                                             value={formData.aboutTitle}
                                             onChange={(e) => setFormData({ ...formData, aboutTitle: e.target.value })}
                                             className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500"
-                                            placeholder="About Beautec"
+                                            placeholder="About Salonix"
                                         />
                                     </div>
                                     <div>
@@ -498,7 +498,7 @@ const Settings = () => {
                                             onChange={(e) => setFormData({ ...formData, aboutText: e.target.value })}
                                             rows={4}
                                             className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-pink-500"
-                                            placeholder="Welcome to Beautec..."
+                                            placeholder="Welcome to Salonix..."
                                         />
                                     </div>
                                     <div className="pt-4">
@@ -554,7 +554,7 @@ const Settings = () => {
                                         </div>
                                         <div>
                                             <label className="text-sm text-gray-400 block mb-1">Contact Email</label>
-                                            <input type="email" value={formData.contactEmail || ''} onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })} className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500" placeholder="hello@beautec.com" />
+                                            <input type="email" value={formData.contactEmail || ''} onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })} className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500" placeholder="hello@salonix.com" />
                                         </div>
                                         <div>
                                             <label className="text-sm text-gray-400 block mb-1">Opening Hours (Display Text)</label>
@@ -660,7 +660,7 @@ const Settings = () => {
                                                 value={formData.copyrightText || ''}
                                                 onChange={(e) => setFormData({ ...formData, copyrightText: e.target.value })}
                                                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500"
-                                                placeholder="© 2024 Beautec. All rights reserved."
+                                                placeholder="© 2024 Salonix. All rights reserved."
                                             />
                                         </div>
 

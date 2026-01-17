@@ -112,7 +112,7 @@ const Checkout = () => {
                                         <div className="bg-gray-800 p-3 rounded-lg text-sm text-gray-300">
                                             <p>Bank: <span className="font-bold text-white">Commercial Bank</span></p>
                                             <p>Account: <span className="font-bold text-white">8810203040</span></p>
-                                            <p>Name: <span className="font-bold text-white">Beautec Salon</span></p>
+                                            <p>Name: <span className="font-bold text-white">Salonix Salon</span></p>
                                         </div>
                                         <input
                                             type="text"

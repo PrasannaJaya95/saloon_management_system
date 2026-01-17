@@ -40,7 +40,7 @@ const WebsiteLayout = () => {
                         <div>
                             <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 flex items-center gap-2">
                                 {settings?.logoUrl && <img src={settings.logoUrl} alt="Logo" className="w-6 h-6 rounded object-cover" />}
-                                {settings?.salonName || 'Beautec'}
+                                {settings?.salonName || 'Salonix'}
                             </h3>
                             <p className="text-gray-400 text-sm leading-relaxed">
                                 {settings?.footerText || 'Experience luxury and wellness redefined. Your personal sanctuary for beauty.'}
@@ -67,7 +67,7 @@ const WebsiteLayout = () => {
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <Mail className="w-5 h-5 text-pink-500 shrink-0" />
-                                    <span>{settings?.contactEmail || 'hello@beautec.com'}</span>
+                                    <span>{settings?.contactEmail || 'hello@salonix.com'}</span>
                                 </li>
                             </ul>
                         </div>
@@ -98,7 +98,7 @@ const WebsiteLayout = () => {
                         </div>
                     </div>
                     <div className="container mx-auto mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-                        {settings?.copyrightText || `© ${new Date().getFullYear()} ${settings?.salonName || 'Beautec Salon'}. All rights reserved.`}
+                        {settings?.copyrightText || `© ${new Date().getFullYear()} ${settings?.salonName || 'Salonix'}. All rights reserved.`}
                     </div>
                 </footer>
             </div>

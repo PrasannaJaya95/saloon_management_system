@@ -39,7 +39,7 @@ const About = () => {
                 {/* Header / Intro */}
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        {settings?.aboutTitle || 'About Beautec'}
+                        {settings?.aboutTitle || 'About Salonix'}
                     </h1>
                     <div className="max-w-3xl mx-auto">
                         <div className="relative mb-8 rounded-3xl overflow-hidden border border-gray-800 shadow-2xl">
@@ -51,7 +51,7 @@ const About = () => {
                             />
                         </div>
                         <p className="text-gray-300 text-lg leading-relaxed whitespace-pre-wrap">
-                            {settings?.aboutText || 'Welcome to Beautec, where beauty meets technology. We offer a wide range of services tailored to your needs.'}
+                            {settings?.aboutText || 'Welcome to Salonix, where beauty meets technology. We offer a wide range of services tailored to your needs.'}
                         </p>
                     </div>
                 </div>

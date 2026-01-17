@@ -46,7 +46,7 @@ const CustomerLayout = () => {
                             <img src={settings.logoUrl} alt={settings.salonName} className="h-10 w-auto object-contain" />
                         ) : (
                             <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-purple-400 drop-shadow-lg glitch-effect">
-                                {settings?.salonName || 'BEAUTEC'}
+                                {settings?.salonName || 'SALONIX'}
                             </h1>
                         )}
                     </div>

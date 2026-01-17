@@ -104,7 +104,7 @@ const AdminLogin = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full bg-gray-950 border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white focus:border-red-500 outline-none transition-all"
-                                placeholder="admin@beautec.com"
+                                placeholder="admin@salonix.com"
                             />
                         </div>
                     </div>
@@ -136,6 +136,11 @@ const AdminLogin = () => {
                         {!loading && <ArrowRight className="w-5 h-5" />}
                     </button>
                 </form>
+                <div className="text-center pt-6">
+                    <a href="/" className="text-gray-500 hover:text-white transition-colors text-sm hover:underline">
+                        &larr; Back to Home
+                    </a>
+                </div>
             </div>
         </div>
     );

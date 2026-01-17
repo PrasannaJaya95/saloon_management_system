@@ -71,7 +71,7 @@ const Contact = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-semibold mb-2">Email Us</h3>
-                                    <p className="text-gray-400">{settings?.contactEmail || 'hello@beautecsalon.com'}</p>
+                                    <p className="text-gray-400">{settings?.contactEmail || 'hello@salonix.com'}</p>
                                 </div>
                             </div>
 

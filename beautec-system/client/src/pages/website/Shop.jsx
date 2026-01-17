@@ -99,7 +99,7 @@ const Shop = () => {
                 <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
                     <div>
                         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-                            Beautec Store
+                            Salonix Store
                         </h1>
                         <p className="text-gray-400">Discover premium beauty products.</p>
                     </div>

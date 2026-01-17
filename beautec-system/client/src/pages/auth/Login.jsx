@@ -67,7 +67,7 @@ const Login = () => {
                         {isLogin ? 'Welcome Back' : 'Create Account'}
                     </h1>
                     <p className="text-gray-400">
-                        {isLogin ? 'Sign in to access your dashboard' : 'Join Beautec today'}
+                        {isLogin ? 'Sign in to access your dashboard' : 'Join Salonix today'}
                     </p>
                 </div>
 
@@ -148,6 +148,12 @@ const Login = () => {
                                 {isLogin ? 'Sign Up' : 'Log In'}
                             </button>
                         </p>
+                    </div>
+
+                    <div className="text-center pt-4 border-t border-gray-800 mt-6">
+                        <a href="/" className="text-gray-500 hover:text-white transition-colors text-sm hover:underline flex items-center justify-center gap-2">
+                            &larr; Back to Home
+                        </a>
                     </div>
                 </form>
             </div>

@@ -218,7 +218,7 @@ const POS = () => {
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                     customerName: 'Walk-in Customer',
-                                    customerEmail: 'walkin@beautec.local',
+                                    customerEmail: 'walkin@salonix.local',
                                     items: cart.map(i => ({
                                         productId: i.type === 'Product' ? i._id : undefined,
                                         serviceId: i.type === 'Service' ? i._id : undefined,

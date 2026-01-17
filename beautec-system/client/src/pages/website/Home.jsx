@@ -106,7 +106,7 @@ const Home = () => {
                             [
                                 { title: 'Hair & Styling', icon: Sparkles, desc: 'Cutting-edge styles by master stylists.' },
                                 { title: 'Spa & Wellness', icon: Star, desc: 'Deep relaxation treatments for mind and body.' },
-                                { title: 'Easy Booking', icon: Calendar, desc: 'Seamless online booking managed by Beautec.' }
+                                { title: 'Easy Booking', icon: Calendar, desc: 'Seamless online booking managed by Salonix.' }
                             ].map((service, idx) => (
                                 <div key={idx} className="p-8 rounded-2xl bg-gray-800/50 border border-gray-700 hover:border-pink-500/50 transition-colors group">
                                     <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center mb-6 group-hover:bg-gradient-to-br from-purple-500 to-pink-500 transition-all">

@@ -6,7 +6,7 @@ export const useShop = () => useContext(ShopContext);
 
 export const ShopProvider = ({ children }) => {
     const [settings, setSettings] = useState({
-        salonName: 'Beautec Salon',
+        salonName: 'Salonix',
         address: 'Loading...',
         phone: 'Loading...',
         currency: 'LKR',
