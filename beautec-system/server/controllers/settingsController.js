@@ -53,26 +53,22 @@ exports.updateSettings = async (req, res) => {
 
         // Handle File Uploads (Logo & Hero Background)
         if (req.files) {
-            const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+            // With cloudinary storage, file.path is the secure_url
 
             if (req.files['logo'] && req.files['logo'][0]) {
-                const logoPath = 'uploads/' + req.files['logo'][0].filename;
-                settings.logoUrl = `${baseUrl}/${logoPath}`;
+                settings.logoUrl = req.files['logo'][0].path;
             }
 
             if (req.files['heroBackground'] && req.files['heroBackground'][0]) {
-                const heroPath = 'uploads/' + req.files['heroBackground'][0].filename;
-                settings.heroBackgroundUrl = `${baseUrl}/${heroPath}`;
+                settings.heroBackgroundUrl = req.files['heroBackground'][0].path;
             }
 
             if (req.files['aboutImage'] && req.files['aboutImage'][0]) {
-                const aboutPath = 'uploads/' + req.files['aboutImage'][0].filename;
-                settings.aboutImageUrl = `${baseUrl}/${aboutPath}`;
+                settings.aboutImageUrl = req.files['aboutImage'][0].path;
             }
 
             if (req.files['contactHero'] && req.files['contactHero'][0]) {
-                const contactPath = 'uploads/' + req.files['contactHero'][0].filename;
-                settings.contactHeroUrl = `${baseUrl}/${contactPath}`;
+                settings.contactHeroUrl = req.files['contactHero'][0].path;
             }
         }
         // Fallback for single file (legacy/safety if middleware didn't parse as fields correctly but shouldn't happen with multer fields)
