@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { Calendar as CalendarIcon, Clock, User, CheckCircle, Armchair, Scissors, ChevronRight, X } from 'lucide-react';
 import { createBooking } from '../../services/api';
 import { DayPicker } from 'react-day-picker';
@@ -27,6 +28,16 @@ const Booking = () => {
     // Details
     const [clientName, setClientName] = useState('');
     const [clientPhone, setClientPhone] = useState('');
+
+    const { user } = useAuth(); // Get user from context
+
+    useEffect(() => {
+        if (user) {
+            setClientName(user.name || '');
+            setClientPhone(user.phone || '');
+            // You can also pre-fill email if you add state for it, but phone/name determines identity in this simple form
+        }
+    }, [user]);
 
     useEffect(() => {
         const fetchData = async () => {

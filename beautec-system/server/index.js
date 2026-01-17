@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const multer = require('multer');
 
 const connectDB = require('./config/db');
 
@@ -13,7 +14,7 @@ const app = express();
    CORS
 ====================== */
 app.use(cors({
-  origin: 'https://codebrazesalon.netlify.app',
+  origin: ['https://codebrazesalon.netlify.app', 'http://localhost:5173', 'http://localhost:5174'],
   credentials: true
 }));
 
@@ -58,8 +59,27 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/chairs', require('./routes/chairs'));
 app.use('/api/team', require('./routes/team'));
 
-app.get('/', (req, res) => {
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Global Error Handler:', err);
+  if (err instanceof multer.MulterError) {
+      return res.status(400).json({ success: false, error: err.message });
+  }
+  res.status(500).json({ 
+      success: false, 
+      error: err.message || 'Server Error', 
+      fullError: JSON.stringify(err, Object.getOwnPropertyNames(err))
+  });
+});app.get('/', (req, res) => {
   res.send('Beautec API is running...');
 });
+
+const PORT = process.env.PORT || 5000;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = app;

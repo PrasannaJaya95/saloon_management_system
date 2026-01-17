@@ -3,19 +3,19 @@ import { Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle } from 'luci
 import { useAuth } from '../../context/AuthContext';
 
 const MyBookings = () => {
-    const { token } = useAuth();
+    const { user } = useAuth();
+    const token = user?.token;
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [filterStatus, setFilterStatus] = useState('All');
+    const [filterDate, setFilterDate] = useState('');
+    const [searchName, setSearchName] = useState('');
 
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-<<<<<<< HEAD
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/my-bookings`, {
-=======
-                const response = await fetch('${import.meta.env.VITE_API_URL}/api/bookings/my-bookings', {
->>>>>>> 2d82a3d91cfc6eb8e0cc660b141703aa58f5ceaa
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -49,18 +49,82 @@ const MyBookings = () => {
 
     if (loading) return <div className="text-white text-center p-10">Loading your bookings...</div>;
 
+    const filteredBookings = bookings.filter(booking => {
+        // Status Filter
+        let matchStatus = true;
+        if (filterStatus !== 'All') {
+            if (filterStatus === 'Upcoming') matchStatus = ['Confirmed', 'Pending'].includes(booking.status);
+            else matchStatus = booking.status === filterStatus;
+        }
+
+        // Date Filter
+        let matchDate = true;
+        if (filterDate) {
+            // booking.date is likely YYYY-MM-DD string or ISO. Normalize to YYYY-MM-DD.
+            const bDate = new Date(booking.date).toISOString().split('T')[0];
+            matchDate = bDate === filterDate;
+        }
+
+        // Name Search
+        let matchName = true;
+        if (searchName) {
+            matchName = booking.clientName?.toLowerCase().includes(searchName.toLowerCase());
+        }
+
+        return matchStatus && matchDate && matchName;
+    });
+
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white">My Bookings</h1>
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+                <h1 className="text-3xl font-bold text-white">My Bookings</h1>
 
-            {bookings.length === 0 ? (
+                <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
+                    {/* Name Search */}
+                    <div className="relative w-full md:w-auto">
+                        <input
+                            type="text"
+                            placeholder="Search client name..."
+                            value={searchName}
+                            onChange={(e) => setSearchName(e.target.value)}
+                            className="bg-gray-900/60 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-white outline-none focus:border-pink-500 transition-all placeholder:text-gray-600 w-full md:w-64"
+                        />
+                    </div>
+
+                    {/* Date Filter */}
+                    <input
+                        type="date"
+                        value={filterDate}
+                        onChange={(e) => setFilterDate(e.target.value)}
+                        className="bg-gray-900/60 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-pink-500 transition-all custom-date-input w-full md:w-auto"
+                    />
+
+                    {/* Status Filter */}
+                    <div className="flex bg-gray-900/60 p-1 rounded-xl border border-white/10 w-full md:w-auto overflow-x-auto no-scrollbar">
+                        {['All', 'Upcoming', 'Completed', 'Cancelled'].map(status => (
+                            <button
+                                key={status}
+                                onClick={() => setFilterStatus(status)}
+                                className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${filterStatus === status
+                                        ? 'bg-pink-600 text-white shadow-lg'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                {status}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {filteredBookings.length === 0 ? (
                 <div className="p-10 rounded-3xl bg-gray-900/40 border border-white/5 text-center text-gray-400">
                     <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No appointment history found.</p>
+                    <p>No {filterStatus === 'All' ? 'appointment history' : `${filterStatus.toLowerCase()} appointments`} found.</p>
                 </div>
             ) : (
                 <div className="grid gap-4">
-                    {bookings.map((booking) => (
+                    {filteredBookings.map((booking) => (
                         <div key={booking._id} className="p-6 rounded-2xl bg-gray-900/60 backdrop-blur-md border border-white/5 hover:border-white/10 transition-all group">
                             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                 <div className="flex items-start gap-4">

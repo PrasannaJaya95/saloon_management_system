@@ -258,46 +258,84 @@ const Shop = () => {
                             </div>
                         ) : products.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {products.map(product => (
-                                    <div key={product._id} className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-pink-500 transition-all duration-300 group hover:shadow-2xl hover:shadow-pink-500/10 flex flex-col">
-                                        <div
-                                            onClick={() => navigate(`/shop/product/${product._id}`)}
-                                            className="h-64 overflow-hidden relative cursor-pointer"
-                                        >
-                                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            {product.itemNumber && (
-                                                <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md font-mono">
-                                                    #{product.itemNumber}
+                                {products.map(product => {
+                                    const isOutOfStock = product.stock <= 0;
+
+                                    return (
+                                        <div key={product._id} className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-pink-500 transition-all duration-300 group hover:shadow-2xl hover:shadow-pink-500/10 flex flex-col relative">
+
+                                            {/* Stock Indicators */}
+                                            {isOutOfStock ? (
+                                                <div className="absolute top-4 -right-12 bg-red-600 text-white text-xs font-bold px-10 py-1 rotate-45 shadow-lg z-20 pointer-events-none tracking-wider">
+                                                    OUT OF STOCK
+                                                </div>
+                                            ) : (
+                                                <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 text-white text-xs font-medium px-3 py-1.5 rounded-full z-20 shadow-xl flex items-center gap-1.5">
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${product.stock < 5 ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`}></div>
+                                                    {product.stock} Qty
                                                 </div>
                                             )}
-                                        </div>
-                                        <div className="p-5 flex flex-col flex-1">
-                                            <div className="mb-2 flex-1">
-                                                <div className="text-xs text-purple-400 font-medium mb-1 uppercase tracking-wider">{product.category}</div>
-                                                <h3
-                                                    onClick={() => navigate(`/shop/product/${product._id}`)}
-                                                    className="text-lg font-bold text-white leading-tight cursor-pointer hover:text-pink-400 transition-colors"
-                                                >
-                                                    {product.name}
-                                                </h3>
+
+                                            <div
+                                                onClick={() => navigate(`/shop/product/${product._id}`)}
+                                                className="h-64 overflow-hidden relative cursor-pointer"
+                                            >
+                                                <img
+                                                    src={product.imageUrl}
+                                                    alt={product.name}
+                                                    className={`w-full h-full object-cover transition-transform duration-700 ${isOutOfStock ? 'grayscale opacity-60' : 'group-hover:scale-110'}`}
+                                                />
+                                                {/* Gradient Overlay */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60"></div>
+
+                                                {product.itemNumber && (
+                                                    <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-gray-300 text-[10px] px-2 py-1 rounded-md font-mono border border-white/5">
+                                                        #{product.itemNumber}
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-800 relative">
-                                                <span className="text-xl font-bold text-white">Rs. {product.price}</span>
-                                                <button
-                                                    onClick={() => addToCart(product)}
-                                                    className="bg-white text-black p-2 rounded-xl hover:bg-gray-200 transition-colors z-10"
-                                                >
-                                                    <ShoppingCart className="w-5 h-5" />
-                                                </button>
+
+                                            <div className="p-5 flex flex-col flex-1 relative">
+                                                <div className="mb-2 flex-1">
+                                                    <div className="text-xs text-purple-400 font-medium mb-1 uppercase tracking-wider">{product.category}</div>
+                                                    <h3
+                                                        onClick={() => navigate(`/shop/product/${product._id}`)}
+                                                        className="text-lg font-bold text-white leading-tight cursor-pointer hover:text-pink-400 transition-colors line-clamp-2"
+                                                    >
+                                                        {product.name}
+                                                    </h3>
+                                                </div>
+
+                                                <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-800/50">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs text-gray-500 font-medium">Price</span>
+                                                        <span className="text-xl font-bold text-white">Rs. {product.price}</span>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => !isOutOfStock && addToCart(product)}
+                                                        disabled={isOutOfStock}
+                                                        className={`p-2.5 rounded-xl transition-all duration-300 flex items-center justify-center
+                                                        ${isOutOfStock
+                                                                ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                                                                : 'bg-white text-black hover:bg-pink-500 hover:text-white shadow-lg hover:shadow-pink-500/25'
+                                                            }`}
+                                                    >
+                                                        <ShoppingCart className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+
                                                 {addedProductId === product._id && (
-                                                    <div className="absolute right-0 bottom-full mb-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs px-2 py-1 rounded-lg animate-in fade-in slide-in-from-bottom-2 whitespace-nowrap">
-                                                        Added!
+                                                    <div className="absolute top-0 left-0 right-0 flex justify-center -mt-8 pointer-events-none">
+                                                        <div className="bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-bounce">
+                                                            Added to Cart!
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    )
+                                })}
                             </div>
                         ) : (
                             <div className="text-center py-12 bg-gray-900/30 rounded-3xl border border-gray-800 border-dashed">

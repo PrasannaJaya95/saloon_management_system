@@ -10,7 +10,12 @@ const Orders = () => {
 
     const fetchOrders = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/orders`);
+            const token = localStorage.getItem('token'); // Or useAuth token if preferred, keeping consistent with other methods in this file
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/orders`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await res.json();
             if (data.success) {
                 setOrders(data.data);

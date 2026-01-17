@@ -183,7 +183,18 @@ exports.getAvailableSlots = async (req, res) => {
 
 exports.getAllBookings = async (req, res) => {
     try {
-        const bookings = await Booking.find()
+        const { date, startDate, endDate } = req.query;
+        let filter = {};
+
+        if (startDate && endDate) {
+            const startStr = new Date(startDate).toISOString().split('T')[0];
+            const endStr = new Date(endDate).toISOString().split('T')[0];
+            filter.date = { $gte: startStr, $lte: endStr };
+        } else if (date) {
+            // date field in Booking is string "YYYY-MM-DD"
+            filter.date = date;
+        }
+        const bookings = await Booking.find(filter)
             .populate('services', 'name price duration') // Correct field name
             .populate('staffId', 'name')
             .populate('chairId', 'name description')   // Correct field name

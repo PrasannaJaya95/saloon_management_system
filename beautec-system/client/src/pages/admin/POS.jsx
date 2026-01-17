@@ -74,17 +74,44 @@ const POS = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                     {viewMode === 'products' ? (
                         products.length === 0 ? <div className="text-gray-500 p-8 col-span-3 text-center">No products found.</div> :
-                            products.map(product => (
-                                <div key={product._id} onClick={() => addToCart(product, 'Product')} className="bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-pink-500 transition-all group border border-gray-700">
-                                    <div className="h-32 overflow-hidden bg-gray-900">
-                                        <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            products.map(product => {
+                                const isOutOfStock = product.stock <= 0;
+                                return (
+                                    <div key={product._id}
+                                        onClick={() => !isOutOfStock && addToCart(product, 'Product')}
+                                        className={`relative bg-gray-800 rounded-xl overflow-hidden transition-all group border border-gray-700 
+                                    ${isOutOfStock ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:ring-2 hover:ring-pink-500'}`}
+                                    >
+                                        {/* Stock Indicators */}
+                                        {isOutOfStock ? (
+                                            <div className="absolute top-3 -right-10 bg-red-600 text-white text-[10px] font-bold px-8 py-1 rotate-45 shadow-md z-10 pointer-events-none">
+                                                NO STOCK
+                                            </div>
+                                        ) : (
+                                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] font-medium px-2 py-1 rounded-md z-10 shadow flex items-center gap-1">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${product.stock < 5 ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`}></div>
+                                                {product.stock}
+                                            </div>
+                                        )}
+
+                                        <div className="h-32 overflow-hidden bg-gray-900 relative">
+                                            <img
+                                                src={product.imageUrl}
+                                                alt={product.name}
+                                                className={`w-full h-full object-cover transition-transform duration-500 ${isOutOfStock ? 'grayscale' : 'group-hover:scale-110'}`}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
+                                        </div>
+                                        <div className="p-4 relative">
+                                            <h3 className="font-medium text-white truncate text-sm">{product.name}</h3>
+                                            <div className="flex justify-between items-center mt-1">
+                                                <p className="text-pink-400 font-bold text-sm">Rs. {product.price}</p>
+                                                {product.itemNumber && <span className="text-[10px] text-gray-500">#{product.itemNumber}</span>}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="p-4">
-                                        <h3 className="font-medium text-white truncate">{product.name}</h3>
-                                        <p className="text-pink-400 font-bold mt-1">Rs. {product.price}</p>
-                                    </div>
-                                </div>
-                            ))
+                                )
+                            })
                     ) : (
                         services.length === 0 ? <div className="text-gray-500 p-8 col-span-3 text-center">No services found.</div> :
                             services.map(service => (

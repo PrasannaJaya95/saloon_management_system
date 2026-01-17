@@ -29,7 +29,21 @@ exports.createOrder = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find().sort({ createdAt: -1 });
+        const { date, startDate, endDate } = req.query;
+        let filter = {};
+
+        if (startDate && endDate) {
+            filter.createdAt = {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            };
+        } else if (date) {
+            const start = new Date(date);
+            const end = new Date(date);
+            end.setHours(23, 59, 59, 999);
+            filter.createdAt = { $gte: start, $lte: end };
+        }
+        const orders = await Order.find(filter).sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: orders });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
