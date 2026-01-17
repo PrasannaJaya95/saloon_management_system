@@ -41,14 +41,21 @@ exports.getProducts = async (req, res) => {
         const products = await Product.find(filter).populate('category', 'name');
 
         // Transform imageUrl to be absolute URL if it flows from uploads
-        const productsWithUrl = products.map(p => ({
-            ...p._doc,
-            category: p.category ? p.category.name : 'Uncategorized', // Flatten for frontend compatibility if needed
-            categoryId: p.category ? p.category._id : null,
-            imageUrl: p.imageUrl && !p.imageUrl.startsWith('http')
-                ? `${req.protocol}://${req.get('host')}/uploads/${p.imageUrl}`
-                : p.imageUrl
-        }));
+        const productsWithUrl = products.map(p => {
+            let imageUrl = p.imageUrl;
+            if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('https')) {
+                // Clean up the path: remove 'uploads/' or 'uploads\' prefix if present to avoid duplication
+                const cleanPath = imageUrl.replace(/^uploads[\\\/]/, '').replace(/\\/g, '/');
+                imageUrl = `${req.protocol}://${req.get('host')}/uploads/${cleanPath}`;
+            }
+
+            return {
+                ...p._doc,
+                category: p.category ? p.category.name : 'Uncategorized', // Flatten for frontend compatibility if needed
+                categoryId: p.category ? p.category._id : null,
+                imageUrl: imageUrl
+            };
+        });
 
         res.status(200).json({ success: true, data: productsWithUrl });
     } catch (error) {
@@ -68,13 +75,18 @@ exports.getProductById = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Product not found' });
         }
 
+        let imageUrl = product.imageUrl;
+        if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('https')) {
+            // Clean up the path: remove 'uploads/' or 'uploads\' prefix if present
+            const cleanPath = imageUrl.replace(/^uploads[\\\/]/, '').replace(/\\/g, '/');
+            imageUrl = `${req.protocol}://${req.get('host')}/uploads/${cleanPath}`;
+        }
+
         const productWithUrl = {
             ...product._doc,
             category: product.category ? product.category.name : 'Uncategorized',
             categoryId: product.category ? product.category._id : null,
-            imageUrl: product.imageUrl && !product.imageUrl.startsWith('http')
-                ? `${req.protocol}://${req.get('host')}/uploads/${product.imageUrl}`
-                : product.imageUrl
+            imageUrl: imageUrl
         };
 
         res.status(200).json({ success: true, data: productWithUrl });

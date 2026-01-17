@@ -281,8 +281,9 @@ const Shop = () => {
                                                 className="h-64 overflow-hidden relative cursor-pointer"
                                             >
                                                 <img
-                                                    src={product.imageUrl}
+                                                    src={product.imageUrl || 'https://placehold.co/600x400?text=No+Image'}
                                                     alt={product.name}
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400?text=No+Image'; }}
                                                     className={`w-full h-full object-cover transition-transform duration-700 ${isOutOfStock ? 'grayscale opacity-60' : 'group-hover:scale-110'}`}
                                                 />
                                                 {/* Gradient Overlay */}

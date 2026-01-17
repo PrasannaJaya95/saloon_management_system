@@ -27,8 +27,8 @@ const run = async () => {
         form.append('price', '100');
         form.append('category', categoryId);
 
-        const fileBlob = await openAsBlob(path.join(__dirname, 'test_image.jpg'));
-        form.append('image', fileBlob, 'test_image.jpg');
+        const fileBlob = await openAsBlob(path.join(__dirname, 'uploads', 'hero-main.png'));
+        form.append('image', fileBlob, 'hero-main.png');
 
         form.append('showInWebsite', 'true');
         form.append('showInPOS', 'true');
