@@ -13,7 +13,8 @@ import {
     Armchair,
     User,
     Globe,
-    Package
+    Package,
+    Smile
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useShop } from '../context/ShopContext';
@@ -49,7 +50,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { icon: Package, label: 'Inventory', path: '/admin/inventory' },
         { icon: Armchair, label: 'Chairs & Stations', path: '/admin/chairs' },
         { icon: ShoppingBag, label: 'POS & Billing', path: '/admin/pos' },
-        ...(isAdmin ? [{ icon: Users, label: 'User Management', path: '/admin/staff' }] : []),
+        ...(isAdmin ? [
+            { icon: Users, label: 'Staff Management', path: '/admin/staff' },
+            { icon: Smile, label: 'Customers', path: '/admin/customers' }
+        ] : []),
         { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
         { icon: User, label: 'My Profile', path: '/admin/profile' },
     ];

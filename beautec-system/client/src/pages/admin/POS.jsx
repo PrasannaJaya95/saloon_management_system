@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Trash2, CreditCard } from 'lucide-react';
+import { useShop } from '../../context/ShopContext';
 
 const POS = () => {
     const [cart, setCart] = useState([]);
@@ -9,6 +10,9 @@ const POS = () => {
     const [paymentMethod, setPaymentMethod] = useState('Cash');
     const [paymentRef, setPaymentRef] = useState('');
 
+    const { settings } = useShop(); // Access shop settings for receipt
+    const [lastOrder, setLastOrder] = useState(null); // To allow Reprint
+
     useEffect(() => {
         fetchProducts();
         fetchServices();
@@ -16,7 +20,7 @@ const POS = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.8:5000'}/api/shop/products?pos=true`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/products?pos=true`);
             const data = await res.json();
             if (data.success) setProducts(data.data);
         } catch (error) { console.error(error); }
@@ -24,7 +28,7 @@ const POS = () => {
 
     const fetchServices = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.8:5000'}/api/services`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/services`);
             const data = await res.json();
             if (data.success) setServices(data.data);
         } catch (error) { console.error(error); }
@@ -41,6 +45,78 @@ const POS = () => {
     };
 
     const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+    const printReceipt = (orderData, items) => {
+        const printWindow = window.open('', '', 'height=600,width=400');
+        if (!printWindow) return alert('Popup blocked! Please allow popups to print receipt.');
+
+        const html = `
+            <html>
+                <head>
+                    <title>Print Receipt</title>
+                    <style>
+                        body { font-family: 'Courier New', Courier, monospace; font-size: 12px; margin: 0; padding: 10px; color: #000; }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        .salon-name { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+                        .divider { border-bottom: 1px dashed #000; margin: 10px 0; }
+                        .item-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+                        .item-name { max-width: 65%; }
+                        .totals { display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px; }
+                        .footer { text-align: center; margin-top: 20px; font-size: 10px; }
+                        @media print {
+                            @page { margin: 0; size: 80mm auto; } 
+                            body { margin: 5px; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="salon-name">${settings.salonName || 'Salon Name'}</div>
+                        <div>${settings.address || ''}</div>
+                        <div>${settings.phone || ''}</div>
+                        <br/>
+                        <div>Order #${orderData._id ? orderData._id.slice(-6).toUpperCase() : 'NEW'}</div>
+                        <div>${new Date().toLocaleString()}</div>
+                    </div>
+                
+                    <div class="divider"></div>
+
+                    ${items.map(item => `
+                        <div class="item-row">
+                            <span class="item-name">${item.name}</span>
+                            <span>${settings.currency || 'Rs.'} ${item.price}</span>
+                        </div>
+                    `).join('')}
+
+                    <div class="divider"></div>
+
+                    <div class="totals">
+                        <span>TOTAL</span>
+                        <span>${settings.currency || 'Rs.'} ${orderData.totalAmount || total}</span>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:11px;">
+                        <span>Payment:</span>
+                        <span>${paymentMethod}</span>
+                    </div>
+
+                    <div class="footer">
+                        <p>Thank you for visiting!</p>
+                        <p>Please come again.</p>
+                    </div>
+                </body>
+            </html>
+        `;
+
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.focus();
+        // Wait for styles to load then print
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
+    };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -137,9 +213,16 @@ const POS = () => {
 
             {/* Cart Panel */}
             <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 flex flex-col h-[600px]">
-                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-pink-500" />
-                    Current Bill
+                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 justify-between">
+                    <div className="flex items-center gap-2">
+                        <CreditCard className="w-5 h-5 text-pink-500" />
+                        Current Bill
+                    </div>
+                    {lastOrder && (
+                        <button onClick={() => printReceipt(lastOrder, lastOrder.items || [])} className="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded">
+                            Reprint Last
+                        </button>
+                    )}
                 </h2>
 
                 <div className="flex-1 overflow-y-auto space-y-4 mb-6 pr-2">
@@ -213,6 +296,7 @@ const POS = () => {
                     onClick={async () => {
                         if (cart.length === 0) return alert('Cart is empty');
                         try {
+                            const currentCart = [...cart]; // Capture current state for printing
                             const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shop/orders`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -235,7 +319,13 @@ const POS = () => {
                             });
                             const data = await res.json();
                             if (data.success) {
-                                alert('Payment Processed Successfully!');
+                                // Save for subsequent reprint
+                                const orderData = { ...data.data, totalAmount: total };
+                                setLastOrder({ ...orderData, items: currentCart });
+
+                                // Print
+                                printReceipt(orderData, currentCart);
+
                                 setCart([]);
                             } else {
                                 alert('Error: ' + data.error);
@@ -248,6 +338,7 @@ const POS = () => {
                     className="w-full mt-4 bg-gradient-to-r from-green-500 to-emerald-600 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-opacity text-white shadow-lg"
                 >
                     Process Payment (Rs. {total})
+                    <br /><span className="text-xs font-normal opacity-80">(Auto Print)</span>
                 </button>
             </div>
         </div>

@@ -39,7 +39,8 @@ const Staff = (props) => {
             });
             const data = await res.json();
             if (Array.isArray(data)) {
-                setStaffMembers(data);
+                // Filter out 'User' role (Customers)
+                setStaffMembers(data.filter(u => u.role !== 'User'));
             }
         } catch (error) {
             console.error("Failed to fetch staff", error);
@@ -64,7 +65,7 @@ const Staff = (props) => {
                 alert('User created successfully');
                 setShowModal(false);
                 fetchUsers();
-                setFormData({ name: '', email: '', password: '', role: 'User', position: '', phone: '', permissions: [] });
+                setFormData({ name: '', email: '', password: '', role: 'Manager', position: '', phone: '', permissions: [] });
             } else {
                 alert(data.message || 'Failed to create user');
             }
@@ -182,7 +183,7 @@ const Staff = (props) => {
                             <Trash2 className="rotate-45 w-6 h-6" />
                         </button>
 
-                        <h2 className="text-2xl font-bold mb-6 text-white">Create New User</h2>
+                        <h2 className="text-2xl font-bold mb-6 text-white">Create New Team Member</h2>
 
                         <form onSubmit={handleCreateUser} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,7 +233,9 @@ const Staff = (props) => {
                                         onChange={e => setFormData({ ...formData, role: e.target.value })}
                                         className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-white"
                                     >
-                                        <option value="User">Staff / User</option>
+                                        <option value="Manager">Manager</option>
+                                        <option value="SalonAdmin">Salon Admin</option>
+                                        <option value="HRAdmin">HR Admin</option>
                                         {/* Only SuperAdmin can create Admin */}
                                         {user && user.role === 'SuperAdmin' && <option value="Admin">Admin (Shop Owner)</option>}
                                         <option value="Manager">Manager</option>

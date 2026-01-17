@@ -23,6 +23,7 @@ import Bookings from './pages/admin/Bookings';
 import Reports from './pages/admin/Reports';
 import Settings from './pages/admin/Settings';
 import Chairs from './pages/admin/Chairs';
+import Customers from './pages/admin/Customers';
 import Login from './pages/auth/Login';
 import AdminLogin from './pages/auth/AdminLogin';
 
@@ -118,6 +119,7 @@ function App() {
                     <Route path="staff" element={<Staff />} />
                     <Route path="pos" element={<POS />} />
 
+                    <Route path="customers" element={<Customers />} />
                     <Route path="inventory" element={<Inventory />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="settings" element={<Settings />} />
